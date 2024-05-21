@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import Mensagem from "./components/Mensagem";
 import VerificaNumero from "./components/VerificaNumero";
+import Evento from "./components/Evento";
 
 export default function App() {
   return (
@@ -9,6 +10,7 @@ export default function App() {
       <Mensagem aula="Tecnologias Hibridas" />
       <VerificaNumero numero={2} />
       <VerificaNumero numero={5} />
+      <Evento />
       <StatusBar style="auto" />
     </View>
   );
