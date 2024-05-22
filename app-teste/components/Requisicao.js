@@ -6,7 +6,7 @@ class Requisicao extends React.Component {
     super(props);
     this.state = {
       dados: {},
-      cep: "01153000",
+      cep: "",
     };
 
     this.fetchDados = this.fetchDados.bind(this);
