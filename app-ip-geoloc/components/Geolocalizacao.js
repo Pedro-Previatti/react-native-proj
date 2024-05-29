@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Text, View, TextInput, StyleSheet } from "react-native";
+import { Button, Text, View, TextInput, StyleSheet, Image } from "react-native";
 
 class Geolocalizacao extends React.Component {
   constructor(props) {
@@ -35,6 +35,7 @@ class Geolocalizacao extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        <Image source={require("../assets/favicon.png")} style={styles.image} />
         <View>
           <Text>Digite o endereco de IP: </Text>
           <TextInput
@@ -93,20 +94,57 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
+    backgroundColor: "#f5f5f5",
+  },
+  image: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+  },
+  inputContainer: {
+    width: "100%",
+    marginBottom: 20,
   },
   input: {
-    height: 40,
-    width: "100%",
-    borderColor: "gray",
+    height: 50,
+    borderColor: "#ccc",
     borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    backgroundColor: "#fff",
+    fontSize: 16,
     marginBottom: 10,
-    paddingHorizontal: 10,
+  },
+  buttonContainer: {
+    width: "100%",
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: "#007bff",
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 18,
   },
   dataContainer: {
     marginTop: 20,
+    width: "100%",
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   dataText: {
     fontSize: 16,
-    marginBottom: 5,
+    marginBottom: 8,
+    color: "#333",
   },
 });
