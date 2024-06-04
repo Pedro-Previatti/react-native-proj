@@ -1,5 +1,14 @@
 import React from "react";
-import { Button, Text, View, TextInput, StyleSheet, Image } from "react-native";
+import {
+  Button,
+  Text,
+  View,
+  TextInput,
+  ScrollView,
+  StyleSheet,
+  Image,
+} from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
 class Geolocalizacao extends React.Component {
   constructor(props) {
@@ -8,6 +17,12 @@ class Geolocalizacao extends React.Component {
       api: null,
       KEY: "aa7fb0625d5a4f9bb49fd50af1ad451c",
       ip: "8.8.4.4",
+      region: {
+        latitude: 37.751,
+        longitude: -97.822,
+        latitudeDelta: 0.922,
+        longitudeDelta: 0.421,
+      },
     };
 
     this.findIp = this.findIp.bind(this);
@@ -19,69 +34,106 @@ class Geolocalizacao extends React.Component {
 
   findIp() {
     const options = { method: "GET" };
-
     let url = `https://ipgeolocation.abstractapi.com/v1/?api_key=${this.state.KEY}&ip_address=${this.state.ip}`;
 
     return fetch(url, options)
       .then((response) => response.json())
       .then((response) => {
-        this.setState({ api: response });
-        this.setState({ ip: this.state.api.ip });
+        if (response && response.latitude && response.longitude) {
+          this.setState({
+            api: response,
+            ip: response.ip_address,
+            region: {
+              ...this.state.region,
+              latitude: parseFloat(response.latitude),
+              longitude: parseFloat(response.longitude),
+            },
+          });
+        } else {
+          console.error("Formato de resposta inválido", response);
+        }
         console.log(response);
       })
       .catch((err) => console.error(err));
   }
 
   render() {
+    const { api, region } = this.state;
+
     return (
-      <View style={styles.container}>
-        <Image source={require("../assets/favicon.png")} style={styles.image} />
-        <View>
-          <Text>Digite o endereco de IP: </Text>
-          <TextInput
-            onChange={(api) => {
-              this.setState({ ip: api.nativeEvent.text });
-            }}
-            value={this.state.ip}
-            style={styles.input}
-            placeholder="Digite o endereco de IP"
+      <ScrollView>
+        <View style={styles.container}>
+          <Image
+            source={require("../assets/favicon.png")}
+            style={styles.image}
           />
-        </View>
-        <View>
-          <Button
-            onPress={this.findIp}
-            title="Buscar IP"
-            accessibilityLabel="Buscar os dados do endereco de IP"
-          />
-        </View>
-        {this.state.api && (
-          <View style={styles.dataContainer}>
-            <Text style={styles.dataText}>IP: {this.state.api.ip_address}</Text>
-            <Text style={styles.dataText}>Cidade: {this.state.api.city}</Text>
-            <Text style={styles.dataText}>Regiao: {this.state.api.region}</Text>
-            <Text style={styles.dataText}>Pais: {this.state.api.country}</Text>
-            <Text style={styles.dataText}>
-              Continente: {this.state.api.continent}
-            </Text>
-            <Text style={styles.dataText}>
-              Longitude: {this.state.api.longitude}
-            </Text>
-            <Text style={styles.dataText}>
-              Latitude: {this.state.api.latitude}
-            </Text>
-            <Text style={styles.dataText}>
-              Timezone: {this.state.api.timezone.name}{" "}
-              {this.state.api.timezone.abbreviation}
-            </Text>
-            <Text style={styles.dataText}>
-              Horario: {this.state.api.timezone.current_time}
-            </Text>
-            <Text style={styles.dataText}>
-              Tipo da Conexao: {this.state.api.connection.connection_type}
-            </Text>
+          <View>
+            <Text>Digite o endereco de IP: </Text>
+            <TextInput
+              onChangeText={(text) => this.setState({ ip: text })}
+              value={this.state.ip}
+              style={styles.input}
+              placeholder="Digite o endereco de IP"
+            />
           </View>
-        )}
-      </View>
+          <View>
+            <Button
+              onPress={this.findIp}
+              title="Buscar IP"
+              accessibilityLabel="Buscar os dados do endereco de IP"
+            />
+          </View>
+          {api && (
+            <>
+              <MapView style={styles.map} region={region}>
+                <Marker
+                  coordinate={{
+                    latitude: api.latitude,
+                    longitude: api.longitude,
+                  }}
+                  title="Localização"
+                  description={api.city}
+                  pinColor="red"
+                />
+              </MapView>
+
+              <View style={styles.dataContainer}>
+                <Text style={styles.dataText}>
+                  IP: {this.state.api.ip_address}
+                </Text>
+                <Text style={styles.dataText}>
+                  Cidade: {this.state.api.city}
+                </Text>
+                <Text style={styles.dataText}>
+                  Regiao: {this.state.api.region}
+                </Text>
+                <Text style={styles.dataText}>
+                  Pais: {this.state.api.country}
+                </Text>
+                <Text style={styles.dataText}>
+                  Continente: {this.state.api.continent}
+                </Text>
+                <Text style={styles.dataText}>
+                  Longitude: {this.state.api.longitude}
+                </Text>
+                <Text style={styles.dataText}>
+                  Latitude: {this.state.api.latitude}
+                </Text>
+                <Text style={styles.dataText}>
+                  Timezone: {this.state.api.timezone.name}{" "}
+                  {this.state.api.timezone.abbreviation}
+                </Text>
+                <Text style={styles.dataText}>
+                  Horario: {this.state.api.timezone.current_time}
+                </Text>
+                <Text style={styles.dataText}>
+                  Tipo da Conexao: {this.state.api.connection.connection_type}
+                </Text>
+              </View>
+            </>
+          )}
+        </View>
+      </ScrollView>
     );
   }
 }
@@ -93,6 +145,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    marginTop: 30,
     padding: 20,
     backgroundColor: "#f5f5f5",
   },
@@ -146,5 +199,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
     color: "#333",
+  },
+  map: {
+    width: "100%",
+    height: 300,
+    marginTop: 20,
+    borderRadius: 8,
   },
 });
