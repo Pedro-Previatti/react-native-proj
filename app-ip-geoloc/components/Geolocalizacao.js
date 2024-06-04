@@ -20,8 +20,8 @@ class Geolocalizacao extends React.Component {
       region: {
         latitude: 37.751,
         longitude: -97.822,
-        latitudeDelta: 0.922,
-        longitudeDelta: 0.421,
+        latitudeDelta: 7.376,
+        longitudeDelta: 3.368,
       },
     };
 
@@ -73,19 +73,23 @@ class Geolocalizacao extends React.Component {
               onChangeText={(text) => this.setState({ ip: text })}
               value={this.state.ip}
               style={styles.input}
-              placeholder="Digite o endereco de IP"
+              placeholder="Digite o endereço de IP"
             />
           </View>
           <View>
             <Button
               onPress={this.findIp}
               title="Buscar IP"
-              accessibilityLabel="Buscar os dados do endereco de IP"
+              accessibilityLabel="Buscar os dados do endereço de IP"
             />
           </View>
           {api && (
             <>
-              <MapView style={styles.map} region={region}>
+              <MapView
+                style={styles.map}
+                region={region}
+                customMapStyle={mapStyle}
+              >
                 <Marker
                   coordinate={{
                     latitude: api.latitude,
@@ -98,37 +102,83 @@ class Geolocalizacao extends React.Component {
               </MapView>
 
               <View style={styles.dataContainer}>
+                <Text style={styles.dataText}>IP: {api.ip_address}</Text>
+
                 <Text style={styles.dataText}>
-                  IP: {this.state.api.ip_address}
+                  Organização: {api.connection.autonomous_system_organization}
                 </Text>
+
                 <Text style={styles.dataText}>
-                  Cidade: {this.state.api.city}
+                  ISP: {api.connection.isp_name}
                 </Text>
+
+                <Text style={styles.dataText}>Cidade: {api.city}</Text>
+
+                <Text style={styles.dataText}>Região: {api.region}</Text>
+
                 <Text style={styles.dataText}>
-                  Regiao: {this.state.api.region}
+                  Código Postal: {api.postal_code}
                 </Text>
+
                 <Text style={styles.dataText}>
-                  Pais: {this.state.api.country}
+                  País: {api.country} {"-"} {api.country_code} {api.flag.emoji}
                 </Text>
+
+                <Text style={styles.dataText}>Continente: {api.continent}</Text>
+
+                <Text style={styles.dataText}>Longitude: {api.longitude}</Text>
+
+                <Text style={styles.dataText}>Latitude: {api.latitude}</Text>
+
                 <Text style={styles.dataText}>
-                  Continente: {this.state.api.continent}
+                  Fuso Horário: {api.timezone.name} {api.timezone.abbreviation}
                 </Text>
+
                 <Text style={styles.dataText}>
-                  Longitude: {this.state.api.longitude}
+                  Hora atual: {api.timezone.current_time}
                 </Text>
-                <Text style={styles.dataText}>
-                  Latitude: {this.state.api.latitude}
-                </Text>
-                <Text style={styles.dataText}>
-                  Timezone: {this.state.api.timezone.name}{" "}
-                  {this.state.api.timezone.abbreviation}
-                </Text>
-                <Text style={styles.dataText}>
-                  Horario: {this.state.api.timezone.current_time}
-                </Text>
-                <Text style={styles.dataText}>
-                  Tipo da Conexao: {this.state.api.connection.connection_type}
-                </Text>
+
+                {(() => {
+                  if (api.connection.connection_type === "Corporate") {
+                    return (
+                      <Text style={styles.dataText}>
+                        Tipo da Conexão: Acesso Corporativo
+                      </Text>
+                    );
+                  } else if (api.connection.connection_type === "Cellular") {
+                    return (
+                      <Text style={styles.dataText}>
+                        Tipo da Conexão: Acesso por Celular
+                      </Text>
+                    );
+                  } else if (api.connection.connection_type === "Cable/DSL") {
+                    return (
+                      <Text style={styles.dataText}>
+                        Tipo da Conexão: Acesso por Cabo/DSL
+                      </Text>
+                    );
+                  } else {
+                    return (
+                      <Text style={styles.dataText}>
+                        Tipo da Conexão: Acesso Discado
+                      </Text>
+                    );
+                  }
+                })()}
+
+                {(() => {
+                  if (api.security.is_vpn == true) {
+                    return (
+                      <Text style={styles.dataText}>
+                        Usando VPN: Verdadeiro
+                      </Text>
+                    );
+                  } else {
+                    return (
+                      <Text style={styles.dataText}>Usando VPN: Falso</Text>
+                    );
+                  }
+                })()}
               </View>
             </>
           )}
@@ -139,6 +189,236 @@ class Geolocalizacao extends React.Component {
 }
 
 export default Geolocalizacao;
+
+const mapStyle = [
+  {
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#f5f5f5",
+      },
+    ],
+  },
+  {
+    elementType: "labels.icon",
+    stylers: [
+      {
+        visibility: "off",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#616161",
+      },
+    ],
+  },
+  {
+    elementType: "labels.text.stroke",
+    stylers: [
+      {
+        color: "#f5f5f5",
+      },
+    ],
+  },
+  {
+    featureType: "administrative",
+    elementType: "geometry",
+    stylers: [
+      {
+        visibility: "off",
+      },
+    ],
+  },
+  {
+    featureType: "administrative.land_parcel",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#bdbdbd",
+      },
+    ],
+  },
+  {
+    featureType: "administrative.neighborhood",
+    stylers: [
+      {
+        visibility: "off",
+      },
+    ],
+  },
+  {
+    featureType: "poi",
+    stylers: [
+      {
+        visibility: "off",
+      },
+    ],
+  },
+  {
+    featureType: "poi",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#eeeeee",
+      },
+    ],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text",
+    stylers: [
+      {
+        visibility: "off",
+      },
+    ],
+  },
+  {
+    featureType: "poi",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#757575",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#e5e5e5",
+      },
+    ],
+  },
+  {
+    featureType: "poi.park",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#9e9e9e",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#ffffff",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "labels",
+    stylers: [
+      {
+        visibility: "off",
+      },
+    ],
+  },
+  {
+    featureType: "road",
+    elementType: "labels.icon",
+    stylers: [
+      {
+        visibility: "off",
+      },
+    ],
+  },
+  {
+    featureType: "road.arterial",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#757575",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#dadada",
+      },
+    ],
+  },
+  {
+    featureType: "road.highway",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#616161",
+      },
+    ],
+  },
+  {
+    featureType: "road.local",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#9e9e9e",
+      },
+    ],
+  },
+  {
+    featureType: "transit",
+    stylers: [
+      {
+        visibility: "off",
+      },
+    ],
+  },
+  {
+    featureType: "transit.line",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#e5e5e5",
+      },
+    ],
+  },
+  {
+    featureType: "transit.station",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#eeeeee",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "geometry",
+    stylers: [
+      {
+        color: "#c9c9c9",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text",
+    stylers: [
+      {
+        visibility: "off",
+      },
+    ],
+  },
+  {
+    featureType: "water",
+    elementType: "labels.text.fill",
+    stylers: [
+      {
+        color: "#9e9e9e",
+      },
+    ],
+  },
+];
 
 const styles = StyleSheet.create({
   container: {
